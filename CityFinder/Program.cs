@@ -31,6 +31,13 @@ namespace CityFinder
     {
         private static readonly HttpClient client = new HttpClient();
         private static IConfigurationRoot config;
+
+        private struct CountryCode
+        {
+            public String CountryName { get; set; }
+            public String TwoLetterCode { get; set; }
+        }
+
         private static async Task Main(string[] args)
         {
             InitialSetup();
@@ -49,6 +56,29 @@ namespace CityFinder
             // Set default user-agent on the HttpClient to enable using the Google API from code
             client.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.212 Safari/537.36");
         }
+
+        /// <summary>
+        /// This method displays a table of valid country codes.
+        /// </summary>
+        private static void ListCountryCodes()
+        {
+            IEnumerable<RegionInfo> region = CultureInfo.GetCultures(CultureTypes.SpecificCultures)
+                   .Select(x => new RegionInfo(x.LCID));
+
+            List<CountryCode> countries = (from x in region select new CountryCode { CountryName = x.EnglishName, TwoLetterCode = x.TwoLetterISORegionName })
+                         .Distinct()
+                         .OrderBy(x => x.CountryName)
+                         .ToList<CountryCode>();
+
+            ConsoleTable table = new ConsoleTable("Country", "Country Code");
+
+            foreach (CountryCode country in countries)
+            {
+                table.AddRow(country.CountryName, country.TwoLetterCode);
+            }
+
+            table.Write();
+            Console.WriteLine();
         }
     }
 }
