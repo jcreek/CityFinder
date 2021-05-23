@@ -76,7 +76,7 @@ namespace CityFinder
         /// <returns>Returns a valid country code.</returns>
         private static string GetUserCountryInput()
         {
-            Console.WriteLine("Do you know the valid country code you need?");
+            Console.WriteLine("Do you know the valid country code you need? (Enter 'y' or 'n')");
             string userResponse = Console.ReadLine();
             if (userResponse.ToLower() != "y")
             {
