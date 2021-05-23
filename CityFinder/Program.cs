@@ -49,6 +49,12 @@ namespace CityFinder
 
             // Get the city using an API call
             await GetCity(countryInput, postalCodeInput);
+
+            // Let the user read the results
+            Console.WriteLine("Press any key to finish... ");
+            Console.ReadKey();
+        }
+
         /// <summary>
         /// This method sets up the json config file and sets the user-agent header on the HttpClient.
         /// </summary>
