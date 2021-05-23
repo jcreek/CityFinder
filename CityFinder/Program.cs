@@ -43,6 +43,9 @@ namespace CityFinder
             InitialSetup();
 
             string countryInput = GetUserCountryInput();
+
+            Console.WriteLine("Enter a zip/postal code:");
+            string postalCodeInput = Console.ReadLine();
         /// <summary>
         /// This method sets up the json config file and sets the user-agent header on the HttpClient.
         /// </summary>
