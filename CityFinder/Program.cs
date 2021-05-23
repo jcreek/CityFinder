@@ -46,6 +46,9 @@ namespace CityFinder
 
             Console.WriteLine("Enter a zip/postal code:");
             string postalCodeInput = Console.ReadLine();
+
+            // Get the city using an API call
+            await GetCity(countryInput, postalCodeInput);
         /// <summary>
         /// This method sets up the json config file and sets the user-agent header on the HttpClient.
         /// </summary>
@@ -97,6 +100,43 @@ namespace CityFinder
             }
 
             return countryInput;
+        }
+
+        /// <summary>
+        /// This method queries the Google Geocode API to get a city name from a country and postal code.
+        /// </summary>
+        /// <param name="countryCode">The country code to search for.</param>
+        /// <param name="postalCode">The postal code to search for.</param>
+        /// <returns>Returns nothing, but it needs awaiting as it's calling an external API.</returns>
+        private static async Task GetCity(string countryCode, string postalCode)
+        {
+            string apiKey = config["GoogleMapsGeocodeApiKey"];
+            string requestUri = $"https://maps.googleapis.com/maps/api/geocode/json?key={apiKey}&address={postalCode}&region={countryCode}";
+            string responseBody = string.Empty;
+
+            try
+            {
+                HttpResponseMessage response = await client.GetAsync(requestUri);
+                responseBody = await response.Content.ReadAsStringAsync();
+                response.EnsureSuccessStatusCode();
+
+                GeocodeApiResponse geocodeApiResponse = GeocodeApiResponse.FromJson(responseBody);
+                string cityName = geocodeApiResponse.Results.FirstOrDefault().AddressComponents.FirstOrDefault(a => a.Types.Contains("postal_town")).LongName;
+
+                Console.WriteLine($"The city is called {cityName}");
+            }
+            catch (HttpRequestException ex)
+            {
+                GeocodeApiErrorResponse geocodeApiErrorResponse = GeocodeApiErrorResponse.FromJson(responseBody);
+
+                Console.WriteLine($"Exception caught - Message :{ex.Message}");
+                Console.WriteLine($"Google API request failed with status {geocodeApiErrorResponse.Status}");
+                Console.WriteLine(geocodeApiErrorResponse.ErrorMessage);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Exception caught - Message :{ex.Message}");
+            }
         }
 
         /// <summary>
