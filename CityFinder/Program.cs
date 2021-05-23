@@ -29,7 +29,26 @@ namespace CityFinder
 {
     internal class Program
     {
+        private static readonly HttpClient client = new HttpClient();
+        private static IConfigurationRoot config;
         private static async Task Main(string[] args)
         {
+            InitialSetup();
+
+        /// <summary>
+        /// This method sets up the json config file and sets the user-agent header on the HttpClient.
+        /// </summary>
+        private static void InitialSetup()
+        {
+            // Set up handling json config files
+            IConfigurationBuilder builder = new ConfigurationBuilder()
+                .AddJsonFile($"appsettings.json", true, true)
+                .AddEnvironmentVariables();
+            config = builder.Build();
+
+            // Set default user-agent on the HttpClient to enable using the Google API from code
+            client.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.212 Safari/537.36");
         }
+        }
+    }
 }
