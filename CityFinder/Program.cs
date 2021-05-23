@@ -42,6 +42,7 @@ namespace CityFinder
         {
             InitialSetup();
 
+            string countryInput = GetUserCountryInput();
         /// <summary>
         /// This method sets up the json config file and sets the user-agent header on the HttpClient.
         /// </summary>
@@ -55,6 +56,44 @@ namespace CityFinder
 
             // Set default user-agent on the HttpClient to enable using the Google API from code
             client.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.212 Safari/537.36");
+        }
+
+        /// <summary>
+        /// This method gets the user's input country code safely.
+        /// </summary>
+        /// <returns>Returns a valid country code.</returns>
+        private static string GetUserCountryInput()
+        {
+            Console.WriteLine("Do you know the valid country code you need?");
+            string userResponse = Console.ReadLine();
+            if (userResponse.ToLower() != "y")
+            {
+                ListCountryCodes();
+            }
+
+            bool IsValidCountryInput = false;
+            string countryInput = string.Empty;
+
+            while (!IsValidCountryInput)
+            {
+                Console.WriteLine("Enter a country code:");
+                countryInput = Console.ReadLine();
+
+                try
+                {
+                    // Check that it's a valid country code by initialising a RegionInfo object
+                    RegionInfo regionInfo = new RegionInfo(countryInput);
+                    IsValidCountryInput = true;
+                }
+                catch (Exception)
+                {
+                    Console.WriteLine($"{countryInput} is not a valid country code. Please press any key then find your desired country code from this table.");
+                    Console.ReadKey();
+                    ListCountryCodes();
+                }
+            }
+
+            return countryInput;
         }
 
         /// <summary>
